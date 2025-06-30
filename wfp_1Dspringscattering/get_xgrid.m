@@ -17,6 +17,7 @@ h_temp = h0;
 xmin = (ax + 2*h_temp*W); xmax = (bx - 2*h_temp*W);
 x = linspace(xmin,xmax,Nx)';
 if(xmin>as || xmax<bs)
+   xmin,xmax,h0
     error('Sources are outside allowed region; reduce the time-step or narrow down the domain where sources live');
 end
 

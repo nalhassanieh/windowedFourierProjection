@@ -1,4 +1,4 @@
-function [h0,dataParam] = get_uIncidentInfo(mu)
+function [dt0,dataParam] = get_uIncidentInfo(mu)
 % GET_UINCIDENTINFO prepares information needed for an incident wave of the
 % form uin = exp(-mu*(x - t - t0).^2);
 %
@@ -16,11 +16,8 @@ function [h0,dataParam] = get_uIncidentInfo(mu)
 
 t0 = -3; 
 
-% Choose h0 such that the densities are resolved 
-N0 = 30;               % number of grid points per standard deviation (sd)
-bumpWidth = sqrt(log(1/eps)./mu); 
-h0_vec = bumpWidth./N0;
-h0 = min(h0_vec); 
+% choose the initial time step
+dt0 = pi/(4*sqrt(mu*log(1/eps)));
 
 dataParam.mu = mu; 
 dataParam.t0 = t0; 

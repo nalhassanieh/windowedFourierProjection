@@ -4,7 +4,8 @@ if (uniform_sgrid == 1)
 
 % Save only the selected variables
 fileName = sprintf('%s/WFPworkspaceO%d_T%d_%sM%d_b%d',dataFile,order,round(tFinal),str,M,betaMax);
-
+    matlabDataFile =strcat(fileName,'.mat');
+    
 if (saveWorkspaceOpt == 1)
     % all variables in the workspace
     vars = who;
@@ -24,7 +25,6 @@ if (saveWorkspaceOpt == 1)
     fprintf('saved workspace to %s\n',matlabDataFile);
 
 elseif(addErrResults == 1)
-    matlabDataFile =strcat(fileName,'.mat');
     if(isfile(matlabDataFile))
         save(fileName, 'sc_err', '-append');
         fprintf('added error to the data file in %s\n',matlabDataFile);

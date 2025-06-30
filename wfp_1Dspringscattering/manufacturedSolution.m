@@ -1,4 +1,4 @@
-function [h0,dataParam] = manufacturedSolution(M,tFinal)
+function [dt0,dataParam] = manufacturedSolution(M,tFinal)
 % MANUFACTUREDSOLUTION  analytic density functions
 %
 % [sig,Nx0,h0,t0,mu] = manufacturedSolution(M,tFinal,s,beta)
@@ -27,19 +27,9 @@ override = 0; % turn on '1' to avoid restrictions on chosen test function
 mu = linspace(40,50,M)'; 
 t0 = linspace(1,3,M)'; 
 
-% choose t0 such that sig(0) = 0.01*eps
-% t0 = sqrt(log(amp/(0.01*eps))./mu); 
-
-%%% Working resolution using standard deviation 
-N0 = 20;               % number of grid points per standard deviation (sd)
-bumpWidth = sqrt(log(1/eps)./mu); 
-h0_vec = bumpWidth./N0;
-h0 = min(h0_vec); 
-
-%%% Resolution computed from Fourier analysis
-% omega0 = 2*sqrt(mu).*sqrt(log((1/tol)*sqrt(pi./mu))); 
-% h0 = min(pi*(1 - gam)./omega0); 
-% Nt0 = ceil(tFinal/h0); % or Nt0 = ceil(2*pi/h0);
+% choose the initial time step
+dt0_vec = pi./(4*sqrt(mu*log(1/eps)));
+dt0 = min(dt0_vec); 
 
 % ensure that the forcing function is bandlimited within the computational time domain
 if(any(2*t0>tFinal)&&(override == 0))

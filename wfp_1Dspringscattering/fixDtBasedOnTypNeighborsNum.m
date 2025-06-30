@@ -1,4 +1,4 @@
-function [dt,typNumOfNeighbors] = fixDtBasedOnTypNeighborsNum(maxNumNeighbors,src_dmn,W,M,dt)
+function [dt,typNumOfNeighbors] = fixDtBasedOnTypNeighborsNum(maxNumNeighbors,src_dmn,W,M,dt,keepdt)
 % FIXDTBASEDONTYPNEIGHBORSNUM adjusts dt to make sure num of local
 %  neighbors is less than a maximum value
 % 
@@ -25,7 +25,7 @@ end
 
 typNumOfNeighbors = ceil(2*W*dt*M/(bs - as));
 
-if(typNumOfNeighbors>maxNumNeighbors)
+if(typNumOfNeighbors>maxNumNeighbors && keepdt == 0)
     dt = (bs - as)*maxNumNeighbors/(2*W*M);
     fprintf('time step changed to dt = %1.2e to ensure maximum number of neighbors %d\n',dt,maxNumNeighbors);
     typNumOfNeighbors = maxNumNeighbors; 

@@ -2,67 +2,49 @@ startMatlabFile
 
 %% Set file directories to save data, figures, tables and movies
 addpath ./utils;
-dataFile = './data';
+dataFile = '/Users/nalhassanieh/Desktop/WFP_results/data';
 figFile = './fig';
 
-%% Testing Buttons
-plotOpt = 0;        % '1' to plot sol at final time, '2' heat maps
-saveWorkspaceOpt = 0; 
-addErrResults = 0; 
-savePlot = 0; 
-logScale = 0;          % '1' to use log scale in heat maps   
-printTimeStep = 0;        % '1' to print out each time step
-evalSol = 1; 
-
 %% Problem parameters
-%%% order and test solution
-order = 2;            % order of accuracy = interpolation 
-numResolutions = 3;   % num of grid resolutions
-solnType = 'ms';      % type of solution 'ms' or 'true'
+expNum = 6; % experiment number
 
-%%% domain and final time
+[plotOpt,saveWorkspaceOpt,addErrResults,savePlot,...
+    logScale,printTimeStep,evalSol,order,numResolutions,solnType,tFinal,...
+    Nx,Nt_sol,M,maxNumNeighbors,src_dmn,ds,...
+    uniform_sgrid,betaMax,mu,dt0_min,uniform_beta,keepdt]...
+     = get_experimentParameters(expNum); 
+
+%%% domain 
 ax = -pi; bx = pi;    % Domain
-tFinal = 3*pi;        % final time
 tsStop = -1;          % stop time stepping at tsStop. ('-1' continue to tFinal)
 
-%%% Choose number of spatial and temporal set for solution computation
-Nx = 10;              % size of spatial grid for testing and plotting
-Nt_sol = 10;          % size of the time grid for testing and plotting
-tSOL = tFinal/Nt_sol; % time-step for the solution evaluation
-
-%%% sources
-M = 10;               % number of sources
-maxNumNeighbors = 10; % set max number of neighbors
-src_dmn = [-1,1]; 
-ds = 1e-4;          % set min distance between sources
-uniform_sgrid = 0; 
+%%% sources and spring constants
 s = get_sourceGrid(src_dmn,ds,M,uniform_sgrid); 
-
-%%% spring constants
-betaMax = 3; uniform_beta = 0; 
 beta = get_springConstants(betaMax,M,uniform_beta); 
 
-%%% incident pulse parameter
-mu = 30;
+%%% Choose number of spatial and temporal set for solution computation
+tSOL = tFinal/Nt_sol; % time-step for the solution evaluation
 
 %%% window
 tol = 1e-12;    % error tolerance
 [winData,W] = setup_generalwindow(tol); 
 
+%% Manufactured density values for testing or incident wave for true scattering 
+if(strcmp(solnType,'ms'));[dt0,dataParam] = manufacturedSolution(M,tFinal);
+else; [dt0,dataParam] = get_uIncidentInfo(mu); end 
+dt0 = min(dt0_min,dt0); % domain RBC constraint 
+
+% fix initial time step 
+[dt0,typNumOfNeighbors] = fixDtBasedOnTypNeighborsNum(maxNumNeighbors,src_dmn,W,M,dt0,keepdt);
+Nt0 = 2*ceil(0.5*tFinal/dt0); 
+dt0 = tFinal/Nt0; 
+
 %% Compute some values for the window function and GL
 P = W; % GL nodes 
 gl = glwt_prep(P); % GL nodes and weights on [-1,1]
 
-%% Manufactured density values for testing or incident wave for true scattering 
-if(strcmp(solnType,'ms'));[h0,dataParam] = manufacturedSolution(M,tFinal);
-else; [h0,dataParam] = get_uIncidentInfo(mu); end 
-
-% fix initial time step 
-[h0,typNumOfNeighbors] = fixDtBasedOnTypNeighborsNum(maxNumNeighbors,src_dmn,W,M,h0);
-Nt0 = ceil(tFinal/h0); if(mod(Nt0,2) == 1); Nt0 = Nt0 + 1; end
-
 % get the spatial grid
-x = get_xgrid(ax,bx,src_dmn,Nx,h0,W);
+x = get_xgrid(ax,bx,src_dmn,Nx,dt0,W);
 
 %% Print title
 printTitle(tFinal, tol, W, P, M, typNumOfNeighbors, order, solnType);
@@ -76,14 +58,17 @@ if(evalSol == 1)
     t_cell = cell(1,numResolutions); 
     x_cell = cell(1,numResolutions); 
     sn_cell = cell(1,numResolutions); 
+    tm_cell = cell(1,numResolutions);
 end
 
 for m = 1:numResolutions
-    N = Nt0*(2^(m-1));
 
-    dt = 2*pi/N;
-    Nt = ceil(tFinal/dt);
-    dt = tFinal/Nt;          % timestep
+    dt = dt0/(2^(m-1));
+    Nt = Nt0*2^(m-1);    % number of time steps
+
+    N = 2*ceil(0.5*2*(pi/dt)); % N = number of Fourier modes case gamma = 0.5;
+    % ensure N is even
+
     h_RBC = 2*pi/N;
 
     tgh = W + order;
@@ -199,6 +184,7 @@ for m = 1:numResolutions
         t_cell{m} = tn_sol; 
         x_cell{m} = x'; 
         sn_cell{m} = sn_sol; 
+        tm_cell{m} = tm; 
 
         % Check the error at all time
         if(strcmp(solnType,'ms'))
