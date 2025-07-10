@@ -22,10 +22,15 @@ function [dt0,dataParam] = manufacturedSolution(M,tFinal)
 %  Notes:
 % Take the densities to be Gaussians for testing. 
 
+if nargin == 0, test_manufacturedSolution(); return; end
+
 override = 0; % turn on '1' to avoid restrictions on chosen test function
 
-mu = linspace(40,50,M)'; 
-t0 = linspace(1,3,M)'; 
+% mu = linspace(40,50,M)'; 
+mu = linspace(2,5,M)'; 
+
+% choose t0 such that sig(0) = eps
+t0 = sqrt(log(1/eps)./mu); 
 
 % choose the initial time step
 dt0_vec = pi./(4*sqrt(mu*log(1/eps)));
@@ -42,5 +47,17 @@ sig = @(t) exp(-mu.*((t - t0).^2));
 dataParam.sig = sig; 
 dataParam.t0 = t0; 
 dataParam.mu = mu; 
+
+end
+
+%%%% 
+function test_manufacturedSolution()
+
+M = 1; tFinal = 3*pi; 
+[dt0,dataParam] = manufacturedSolution(M,tFinal); 
+
+t = linspace(0,tFinal,1000);
+figure(1)
+plot(t,dataParam.sig(t)); grid on; 
 
 end

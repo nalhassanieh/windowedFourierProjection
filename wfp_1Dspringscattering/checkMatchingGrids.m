@@ -8,6 +8,7 @@ end
 
 tol = 1e-12;
 if(tGridErr>tol || xGridErr>tol)
+    fprintf('tGridErr = %1.2e, xGridErr = %1.2e\n',tGridErr,xGridErr); 
     warning('Time or space grids do not match to report self-convergence');
 end
 

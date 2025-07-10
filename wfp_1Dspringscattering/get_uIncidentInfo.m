@@ -1,4 +1,4 @@
-function [dt0,dataParam] = get_uIncidentInfo(mu)
+function [dt0,dataParam] = get_uIncidentInfo(dataParam)
 % GET_UINCIDENTINFO prepares information needed for an incident wave of the
 % form uin = exp(-mu*(x - t - t0).^2);
 %
@@ -14,12 +14,37 @@ function [dt0,dataParam] = get_uIncidentInfo(mu)
 %   dataParam: is struct to hold mu and t0 (for ease of switching between
 %   types of test solutions
 
-t0 = -3; 
+if nargin == 0, test_get_uIncidentInfo(); return; end
+
+mu = dataParam.mu; 
+t0 = dataParam.t0;
+
+if(isnan(t0))
+    t0 = -sqrt(log(1/eps)./mu);
+end
 
 % choose the initial time step
 dt0 = pi/(4*sqrt(mu*log(1/eps)));
 
-dataParam.mu = mu; 
-dataParam.t0 = t0; 
+if(isfield(dataParam,'doubleTimeStep'))
+    if(dataParam.doubleTimeStep == 1)
+        dt0 = 2*dt0;
+    end
+end
+
+dataParam.t0 = t0;
+
+end
+
+function test_get_uIncidentInfo()
+
+mu = 5; 
+[dt0,dataParam] = get_uIncidentInfo(mu); 
+
+x = linspace(-pi,pi,1000); t = linspace(0,3*pi,1000); t0 = dataParam.t0; 
+uin = get_uIncident(x,t,mu,t0); 
+
+figure(1)
+imagesc(x,t,uin);
 
 end

@@ -2,16 +2,16 @@ startMatlabFile
 
 %% Set file directories to save data, figures, tables and movies
 addpath ./utils;
-dataFile = '/Users/nalhassanieh/Desktop/WFP_results/data';
+dataFile = './data';
 figFile = './fig';
 
 %% Problem parameters
-expNum = 6; % experiment number
+expNum = 1; % experiment number
 
 [plotOpt,saveWorkspaceOpt,addErrResults,savePlot,...
     logScale,printTimeStep,evalSol,order,numResolutions,solnType,tFinal,...
     Nx,Nt_sol,M,maxNumNeighbors,src_dmn,ds,...
-    uniform_sgrid,betaMax,mu,dt0_min,uniform_beta,keepdt]...
+    uniform_sgrid,betaMax,dataParam,dt0_min,uniform_beta,keepdt]...
      = get_experimentParameters(expNum); 
 
 %%% domain 
@@ -31,7 +31,7 @@ tol = 1e-12;    % error tolerance
 
 %% Manufactured density values for testing or incident wave for true scattering 
 if(strcmp(solnType,'ms'));[dt0,dataParam] = manufacturedSolution(M,tFinal);
-else; [dt0,dataParam] = get_uIncidentInfo(mu); end 
+else; [dt0,dataParam] = get_uIncidentInfo(dataParam); end 
 dt0 = min(dt0_min,dt0); % domain RBC constraint 
 
 % fix initial time step 
@@ -39,7 +39,7 @@ dt0 = min(dt0_min,dt0); % domain RBC constraint
 Nt0 = 2*ceil(0.5*tFinal/dt0); 
 dt0 = tFinal/Nt0; 
 
-%% Compute some values for the window function and GL
+%% Compute some values for the window function and GL*
 P = W; % GL nodes 
 gl = glwt_prep(P); % GL nodes and weights on [-1,1]
 
@@ -163,7 +163,7 @@ for m = 1:numResolutions
         % update values for the next time step
         [an,bn,sn,sn_hat] = prepForNextStep(anp1,bnp1,sn,sn_hat,snIdxNow,tgh,s,N,tol);
 
-        if(printTimeStep == 1)
+        if(printTimeStep == 1 && mod(totalSteps,100) == 0)
             fprintf('t = %1.4e\n',t);
         end
 

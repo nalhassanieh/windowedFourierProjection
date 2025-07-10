@@ -18,8 +18,8 @@ switch expNum
         evalSol = 1;
 
         % parameters
-        order = 3;            % order of accuracy = interpolation
-        numResolutions = 3;   % num of grid resolutions
+        order = 2;            % order of accuracy = interpolation
+        numResolutions = 1;   % num of grid resolutions
         solnType = 'ms';      % type of solution 'ms' or 'true'
 
         tFinal = 3*pi;        % final time
@@ -33,10 +33,10 @@ switch expNum
         maxNumNeighbors = NaN; % set max number of neighbors
         src_dmn = [-2,2];
         ds = 1e-4;          % set min distance between sources
-        uniform_sgrid = 0;
+        uniform_sgrid = 1;
 
         %%% spring constants
-        betaMax = 3; uniform_beta = 0;
+        betaMax = 3; uniform_beta = 1;
 
         %%% incident pulse parameter
         keepdt = 0;
