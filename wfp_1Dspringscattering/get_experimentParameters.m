@@ -10,12 +10,12 @@ switch expNum
     case 1
         % testing buttons
         plotOpt = 0;        % '1' to plot sol at final time, '2' heat maps
-        saveWorkspaceOpt = 0;
-        addErrResults = 0;
-        savePlot = 0;
+        saveWorkspaceOpt = 0;  % '1' to save the workspace
+        addErrResults = 0;     % '1' to add error results to saved workspace
+        savePlot = 0;          % '1' to save any plots to fig files
         logScale = 0;          % '1' to use log scale in heat maps
-        printTimeStep = 0;        % '1' to print out each time step
-        evalSol = 1;
+        printTimeStep = 0;     % '1' to print out each time step
+        evalSol = 1;           % '1' to evaluate the solution
 
         % parameters
         order = 3;            % order of accuracy = interpolation
@@ -29,19 +29,20 @@ switch expNum
         Nt_sol = 5;          % size of the time grid for testing and plotting
 
         %%% sources
-        M = 10;               % number of sources
+        M = 10;                % number of sources
         maxNumNeighbors = NaN; % set max number of neighbors
-        src_dmn = [-2,2];
-        ds = 1e-4;          % set min distance between sources
-        uniform_sgrid = 0;
+        src_dmn = [-2,2];      % domain where sources live
+        ds = 1e-4;             % set min distance between sources
+        uniform_sgrid = 0;     % '1' to generate uniform source grid
 
         %%% spring constants
-        betaMax = 3; uniform_beta = 0;
+        betaMax = 3;           % maximum spring constant value
+        uniform_beta = 0;      % '1' to generate uniform beta grid
 
         %%% incident pulse parameter
-        keepdt = 0;
+        keepdt = 0;            % '1' to NOT fix dt based on the number of neighbors
 
-        dt0_min = 0.01; % RBC constraint
+        dt0_min = 0.01;        % RBC constraint
 
     case 2 % localization plots
         % testing buttons
